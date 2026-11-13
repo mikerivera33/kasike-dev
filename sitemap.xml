@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://kasike.dev/</loc><lastmod>2026-11-12</lastmod></url>
-  <url><loc>https://kasike.dev/articles</loc><lastmod>2026-11-12</lastmod></url>
-  <url><loc>https://kasike.dev/articles/the-long-ride-home</loc><lastmod>2026-11-12</lastmod></url>
-  <url><loc>https://kasike.dev/articles/the-three-percent-standard</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://kasike.dev/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://kasike.dev/articles</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://kasike.dev/ledger</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://kasike.dev/articles/the-long-ride-home</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://kasike.dev/articles/the-three-percent-standard</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://kasike.dev/articles/long-sleeves</loc><lastmod>2026-11-13</lastmod></url>
 </urlset>

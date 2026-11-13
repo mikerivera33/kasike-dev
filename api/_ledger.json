@@ -1,0 +1,243 @@
+{
+ "generated": "2026-11-13T07:00:00Z",
+ "live": false,
+ "repos": [
+  {
+   "id": "kasike-dev",
+   "repo": "mikerivera33/kasike-dev",
+   "branch": "main",
+   "name": "kasike.dev",
+   "what": "This site. Static pages plus one small function, no framework.",
+   "demo": "https://kasike.dev/",
+   "demoLabel": "kasike.dev",
+   "deploys": [
+    2,
+    2
+   ],
+   "score": "More than 150 automated checks pass on this build, including 12 failure-injection tests, with 0 accessibility violations.",
+   "tradeoff": "No framework and no build step on the host. I hand-rolled the routing and gave up convenience. In return an article page stays under 200 KB and the security policy stays strict.",
+   "fix": "Article pages were downloading the whole 3D scene. It now loads only on the tower page: 2.4 MB down to 174 KB.",
+   "commits": [
+    {
+     "sha": "99e9b81",
+     "date": "2026-11-13T05:37:08Z",
+     "kind": "fix",
+     "text": "Article pages were downloading the whole 3D scene. It now loads only on the tower page: 2.4 MB down to 174 KB."
+    },
+    {
+     "sha": "65c38b8",
+     "date": "2026-11-13T05:18:03Z",
+     "kind": "feature",
+     "text": "First production build of this site: real page addresses, self-hosted fonts and strict security headers."
+    }
+   ],
+   "src": "snapshot",
+   "latency": null,
+   "head": null
+  },
+  {
+   "id": "aurevon-site",
+   "repo": "mikerivera33/Aurevon-site",
+   "branch": "main",
+   "name": "Aurevon Ventures",
+   "what": "Company site with memberships, Stripe payments and automatic Discord access.",
+   "demo": "https://www.aurevonvc.com/",
+   "demoLabel": "aurevonvc.com",
+   "deploys": [
+    6,
+    6
+   ],
+   "score": "Public copy cut by 37%: 58.5k characters down to 37k across 21 pages.",
+   "tradeoff": "A subscriber is identified from the Stripe customer record, not from an email typed into a request. More plumbing, but a request cannot claim someone else’s subscription.",
+   "fix": "Payment methods that settle later were reported as complete before the money arrived. Fulfilment now waits for the funds.",
+   "commits": [
+    {
+     "sha": "3aff051",
+     "date": "2026-11-03T21:06:52Z",
+     "kind": "fix",
+     "text": "Buy-one-get-one orders no longer earn a membership pass, and a duplicate product listing is gone. The site copy and the back end now agree."
+    },
+    {
+     "sha": "42e016f",
+     "date": "2026-11-03T06:00:29Z",
+     "kind": "feature",
+     "text": "Cut the public pages down to headings, facts and actions: 58.5k characters of text to 37k across 21 pages."
+    },
+    {
+     "sha": "7e140af",
+     "date": "2026-11-02T22:30:42Z",
+     "kind": "docs",
+     "text": "Wrote down the verified production setup and the rules for payments, intake and Discord, so every later change follows them."
+    },
+    {
+     "sha": "ea94940",
+     "date": "2026-11-02T22:30:19Z",
+     "kind": "fix",
+     "text": "Payment lifecycle tightened: nothing ships before funds settle, and a cancelled member loses access cleanly."
+    },
+    {
+     "sha": "2331f6a",
+     "date": "2026-11-02T22:22:32Z",
+     "kind": "fix",
+     "text": "A payment lookup was failing in production with no reason recorded. Added the logging needed to find the cause."
+    }
+   ],
+   "src": "snapshot",
+   "latency": null,
+   "head": null
+  },
+  {
+   "id": "forge",
+   "repo": "mikerivera33/Forge-ai",
+   "branch": "main",
+   "name": "Forge",
+   "what": "A custom storefront with Shopify behind the counter, and a shopping assistant in the chat.",
+   "demo": "https://forge.aurevonvc.com/",
+   "demoLabel": "forge.aurevonvc.com",
+   "deploys": [
+    6,
+    6
+   ],
+   "score": "Every push runs unit tests, lint and a smoke test against production after it deploys.",
+   "tradeoff": "The chat assistant runs under a hard spending cap with strict request checks. It refuses before it overspends.",
+   "fix": "Adding an item from the chat covered the conversation with the cart, so a shopper could not keep talking. Fixed in the next push.",
+   "commits": [
+    {
+     "sha": "690f112",
+     "date": "2026-11-02T21:44:58Z",
+     "kind": "security",
+     "text": "Hardened the chat’s rate limit so a visitor cannot dodge it."
+    },
+    {
+     "sha": "2811d19",
+     "date": "2026-11-02T21:28:17Z",
+     "kind": "fix",
+     "text": "Adding an item from the chat used to cover the conversation with the cart. Now you can keep talking."
+    },
+    {
+     "sha": "5f0bc40",
+     "date": "2026-11-02T21:10:08Z",
+     "kind": "test",
+     "text": "The post-deploy check now waits until production is serving the new code, then smoke-tests it."
+    },
+    {
+     "sha": "77772a4",
+     "date": "2026-11-02T21:09:51Z",
+     "kind": "feature",
+     "text": "Ask Forge chat: requests are validated, spend is capped, cart options are strict and the widget is accessible."
+    },
+    {
+     "sha": "c039d4f",
+     "date": "2026-11-02T20:41:32Z",
+     "kind": "test",
+     "text": "Automated checks now cover the storefront, the post-deploy check actually runs, and lint errors block a merge."
+    }
+   ],
+   "src": "snapshot",
+   "latency": null,
+   "head": null
+  },
+  {
+   "id": "interlude",
+   "repo": "mikerivera33/aurevon-interlude",
+   "branch": "main",
+   "name": "Interlude",
+   "what": "A marketplace for AI wait time: sponsors pay for verified seconds, the person waiting earns a share.",
+   "demo": "https://interlude.aurevonvc.com/",
+   "demoLabel": "interlude.aurevonvc.com",
+   "deploys": [
+    6,
+    6
+   ],
+   "score": "Billing audit: an exact 25.000000% split across 31 settled sessions, zero ledger drift, and settle-once held under 25 parallel requests.",
+   "tradeoff": "Backups upload off-site from inside the app, because the production image ships without a storage client. One more thing to maintain, nothing extra to install on the server.",
+   "fix": "A stress audit turned up ten findings and a real phone turned up three layout bugs. All thirteen are closed.",
+   "commits": [
+    {
+     "sha": "ddc021d",
+     "date": "2026-09-02T03:14:47Z",
+     "kind": "feature",
+     "text": "Took the site public: removed the preview password gate and the code that only existed to support it."
+    },
+    {
+     "sha": "5841d99",
+     "date": "2026-08-24T09:42:44Z",
+     "kind": "docs",
+     "text": "Documented two settings that scripts read but the setup checklist never mentioned."
+    },
+    {
+     "sha": "04a0cda",
+     "date": "2026-08-22T08:53:45Z",
+     "kind": "fix",
+     "text": "Tested on a real phone screen, found three wallet layout bugs (one tab was cut off) and fixed them."
+    },
+    {
+     "sha": "88c3572",
+     "date": "2026-08-17T08:49:14Z",
+     "kind": "feature",
+     "text": "Built off-site backups into the app, because the production server had no tool to upload them."
+    },
+    {
+     "sha": "d442147",
+     "date": "2026-08-17T01:09:57Z",
+     "kind": "fix",
+     "text": "Closed all ten findings from an end-to-end stress audit. The billing core itself came out exact."
+    }
+   ],
+   "src": "snapshot",
+   "latency": null,
+   "head": null
+  },
+  {
+   "id": "labs",
+   "repo": "mikerivera33/aurevon-labs",
+   "branch": "master",
+   "name": "Aurevon Labs",
+   "what": "The Labs site and the media pipeline behind the scheduled @AurevonLabs posts.",
+   "demo": "https://labs.aurevonvc.com/",
+   "demoLabel": "labs.aurevonvc.com",
+   "deploys": [
+    5,
+    5
+   ],
+   "score": "28 of 28 images passed verification (size, checksum, format) before they went live.",
+   "tradeoff": "Post images ship as plain files on the site instead of through an upload service. Every pack is a commit: slower to publish, fully traceable.",
+   "fix": "A generated graphic went out with garbled labels. Rebuilt it with letter-perfect copy.",
+   "commits": [
+    {
+     "sha": "c164e54",
+     "date": "2026-09-29T13:20:06Z",
+     "kind": "chore",
+     "text": "Added the September 29 image pack so the scheduler can pull it from the Labs site."
+    },
+    {
+     "sha": "b196f62",
+     "date": "2026-09-19T18:38:38Z",
+     "kind": "fix",
+     "text": "A generated graphic shipped with garbled labels. Rebuilt it with letter-perfect copy."
+    },
+    {
+     "sha": "e02023c",
+     "date": "2026-09-15T21:35:52Z",
+     "kind": "chore",
+     "text": "Added the September 15 daily image pack for scheduled posts."
+    },
+    {
+     "sha": "6366c20",
+     "date": "2026-09-15T21:31:49Z",
+     "kind": "chore",
+     "text": "Added 28 article images. Each file was verified by size, checksum and format before it went live."
+    },
+    {
+     "sha": "f61aebe",
+     "date": "2026-09-15T09:10:47Z",
+     "kind": "chore",
+     "text": "Added the September 9 image pack for scheduled posts."
+    }
+   ],
+   "src": "snapshot",
+   "latency": null,
+   "head": null
+  }
+ ]
+}

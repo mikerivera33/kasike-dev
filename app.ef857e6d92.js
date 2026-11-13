@@ -25,7 +25,7 @@ const FLOORS = [
   why:'In steel and in the shipyard, the paperwork is the proof. Every system I build keeps that habit: nothing ships without a check and a sign-off.',
   label:'Credentials', chips:['Virginia and Columbia class submarines','200+ Navy qualifications','VT · PT · MT · RT inspection','OSHA 30','NYC DOB Site Safety','32-Hr Rigging Supervisor','Foreman · Journeyman']},
  {name:'Underwriting', tag:'Multifamily real estate', color:'#39b98a', prop:'charts',
-  focus:'LJM Homes multifamily syndication and acquisitions, with more than $150M underwritten. Every deal runs through the same three steps.',
+  focus:'LJM Homes is my family’s commercial real estate investment firm: syndication deals from duplexes to 100-unit properties, with more than $150M underwritten. Every deal runs through the same three steps.',
   flow:[
    ['Rentroll','Rent roll cleanup','Standardizes the rent roll into one layout: unit mix, in-place versus market rent, vacancy and lease expirations.','Raw rent roll','Clean unit schedule','standardized the unit mix and flagged the leases expiring this year'],
    ['Analyst','Deal Analyzer','Normalizes the T-12, strips one-time items, and runs the model for NOI, cap rate, cash-on-cash and the sensitivity cases.','Unit schedule, T-12','Underwritten returns','normalized the T-12 and ran the return and sensitivity cases'],
@@ -179,7 +179,7 @@ function renderDetail(){
   stopRun();
   if (sel === null){
     detail.style.setProperty('--c', 'var(--chrome)');
-    detail.innerHTML = `<div class="d-top"><span class="d-kick">Rivera Tower</span><div class="d-title"><h2>How to read the tower</h2></div><p>Each floor shows how a small team of agents runs that line of work. Pick a floor and the ones above it lift away, so you can see how the work moves from one agent to the next.</p></div>
+    detail.innerHTML = `<div class="d-top"><span class="d-kick">The Rivera Nexus</span><div class="d-title"><h2>How to read the tower</h2></div><p>Each floor shows how a small team of agents runs that line of work. Pick a floor and the ones above it lift away, so you can see how the work moves from one agent to the next.</p></div>
     <div class="d-facts"><div><b>6</b><span>floors</span></div><div><b>${agents}</b><span>agents</span></div><div><b>${shipped}</b><span>projects shipped</span></div><div><b>1</b><span>project coming soon</span></div></div>
     <div class="d-sec"><span class="mono">Good places to start</span><div class="chips"><button type="button" data-f="4">05 Labs</button><button type="button" data-f="1">02 Underwriting</button><button type="button" data-f="3">04 Studio</button></div></div>
     ${simHTML('Watch a simulated day across the tower')}`;
@@ -249,21 +249,65 @@ if ('IntersectionObserver' in window){
 
 
 
-/* ---------- articles page: real addresses (/articles, /articles/<slug>) handled in place, so the 3D scene is not reloaded ---------- */
-const reader = $('#reader'), rdBar = $('#rdBar'), ARTS = ['the-long-ride-home', 'the-three-percent-standard'];
-const TITLES = {'': 'Mike Rivera · @kasike', articles: 'Field notes · Mike Rivera', 'the-long-ride-home': 'The Long Ride Home · Mike Rivera', 'the-three-percent-standard': 'The 3% Standard · Mike Rivera'};
+/* ---------- ledger: five repos. The built-in snapshot shows first, then live data from /api/ledger replaces it ---------- */
+const ledEl = $('#ledger'), KINDS = {fix: 'Fix', feature: 'Feature', test: 'Checks', security: 'Security', perf: 'Speed', docs: 'Docs', chore: 'Upkeep', update: 'Update'};
+const hx = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';');
+let LED = null, ledAt = 0;
+try { LED = JSON.parse($('#ledData').textContent); } catch (err) { LED = null; }
+const ago = d => { const t = (Date.now() - Date.parse(d))/1000; return !(t >= 0) ? 'just now' : t < 90 ? 'just now' : t < 5400 ? Math.round(t/60) + ' min ago' : t < 129600 ? Math.round(t/3600) + ' h ago' : t < 5184000 ? Math.round(t/86400) + ' days ago' : 'on ' + new Date(d).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'}); };
+function ledRender(){
+  if (!LED || !ledEl) return;
+  const st = $('#lgStat'); st.dataset.live = LED.live ? '1' : '0';
+  st.innerHTML = '<i aria-hidden="true"></i><span>' + (LED.live ? 'Live · checked <span data-ago="' + hx(LED.generated) + '">' + ago(LED.generated) + '</span> · refreshes on its own' : 'Snapshot from ' + new Date(LED.generated).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'}) + ' · live data loads when the site is online') + '</span>';
+  $('#lgCards').innerHTML = LED.repos.map((r, n) => { const L = r.latency, c0 = r.commits[0], state = !L ? 'na' : L.status >= 400 ? 'down' : L.ms < 800 ? 'ok' : 'slow';
+    return `<article class="lg-card" style="--c:var(--${n % 2 ? 'red' : 'chrome'})" aria-labelledby="lg-${hx(r.id)}"><header><span class="rd-tag">${String(n + 1).padStart(2, '0')} · ${hx(r.repo)}</span><h2 id="lg-${hx(r.id)}">${hx(r.name)}</h2><p>${hx(r.what)}</p></header>` +
+      `<div class="lg-live"><a class="lg-demo" href="${hx(r.demo)}" target="_blank" rel="noopener">Live demo · ${hx(r.demoLabel)}<span aria-hidden="true"> ↗</span></a><span class="lg-ms" data-s="${state}"><i aria-hidden="true"></i>${L ? (L.status >= 400 ? 'Answered with ' + L.status : L.ms + ' ms response') : 'Latency loads live'}</span></div>` +
+      `<dl><div><dt>Score</dt><dd>${hx(r.score)}</dd></div><div><dt>Deploys</dt><dd><span class="lg-dots" aria-hidden="true">${'<i></i>'.repeat(r.deploys[0])}${'<i class="x"></i>'.repeat(r.deploys[1] - r.deploys[0])}</span>${r.deploys[0]} of the last ${r.deploys[1]} production deploys passed</dd></div><div><dt>Tradeoff</dt><dd>${hx(r.tradeoff)}</dd></div><div><dt>Broke, then fixed</dt><dd>${hx(r.fix)}</dd></div></dl>` +
+      `<footer><span class="lg-strip" aria-hidden="true">${r.commits.map(c => `<i data-k="${hx(c.kind)}"></i>`).join('')}</span><span>Last push <span data-ago="${hx(c0.date)}">${ago(c0.date)}</span></span>${r.head ? `<span>· latest deploy ${r.head === 'success' ? 'passing' : r.head === 'pending' ? 'running' : 'failing'}</span>` : ''}${LED.live && r.src !== 'live' ? '<span>· commits from the snapshot</span>' : ''}</footer></article>`; }).join('');
+  $('#lgRows').innerHTML = LED.repos.flatMap(r => r.commits.map(c => ({r, c}))).sort((a, b) => Date.parse(b.c.date) - Date.parse(a.c.date)).slice(0, 18)
+    .map(({r, c}) => `<li><time datetime="${hx(c.date)}">${new Date(c.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric', timeZone: 'UTC'})}</time><span class="lg-repo">${hx(r.name)}</span><span class="lg-kind" data-k="${hx(c.kind)}">${KINDS[c.kind]}</span><p>${hx(c.text)}</p><code>${hx(c.sha)}</code></li>`).join('');
+}
+/* live data is checked field by field; anything missing or malformed keeps the snapshot value */
+function ledMerge(d){
+  if (!d || !Array.isArray(d.repos) || !isFinite(Date.parse(d.generated))) return false;
+  const repos = LED.repos.map(r => { const v = d.repos.find(x => x && x.id === r.id) || {}, o = {...r, src: 'snapshot', latency: null, head: null};
+    const cs = Array.isArray(v.commits) ? v.commits.filter(c => c && /^[0-9a-f]{7}$/.test(c.sha) && KINDS[c.kind] && typeof c.text === 'string' && c.text && isFinite(Date.parse(c.date))).slice(0, 5).map(c => ({sha: c.sha, date: c.date, kind: c.kind, text: c.text.slice(0, 220)})) : [];
+    if (v.src === 'live' && cs.length){ o.commits = cs; o.src = 'live'; }
+    if (v.latency && Number.isFinite(v.latency.ms) && Number.isFinite(v.latency.status)) o.latency = {ms: Math.round(v.latency.ms), status: v.latency.status};
+    if (/^(success|failure|error|pending)$/.test(v.head)) o.head = v.head;
+    return o; });
+  if (!repos.some(r => r.src === 'live' || r.latency)) return false;
+  LED = {generated: d.generated, live: true, repos}; return true;
+}
+function ledLoad(){
+  if (!LED || !ledEl || ledEl.hidden || document.hidden || Date.now() - ledAt < 240000 || !/^https?:$/.test(location.protocol)) return;
+  ledAt = Date.now();
+  fetch('/api/ledger', {headers: {Accept: 'application/json'}}).then(r => r.ok ? r.json() : Promise.reject(new Error('ledger ' + r.status))).then(d => { if (ledMerge(d)) ledRender(); }).catch(() => {});
+}
+ledRender();
+/* the refresh timer only runs while the ledger is the page on screen */
+let ledTimer = 0;
+function ledWatch(on){
+  if (on && !ledTimer && ledEl){ ledTimer = setInterval(() => { if (!document.hidden){ ledEl.querySelectorAll('[data-ago]').forEach(e => { e.textContent = ago(e.dataset.ago); }); ledLoad(); } }, 60000); ledLoad(); }
+  else if (!on && ledTimer){ clearInterval(ledTimer); ledTimer = 0; }
+}
+document.addEventListener('visibilitychange', () => { if (ledTimer) ledLoad(); });
+
+/* ---------- articles and ledger pages: real addresses (/articles, /articles/<slug>, /ledger) handled in place, so the 3D scene is not reloaded ---------- */
+const reader = $('#reader'), rdBar = $('#rdBar'), ARTS = ['the-long-ride-home', 'the-three-percent-standard', 'long-sleeves'];
+const TITLES = {'': 'Mike Rivera · @kasike', articles: 'Field notes · Mike Rivera', ledger: 'Build ledger · Mike Rivera', 'the-long-ride-home': 'The Long Ride Home · Mike Rivera', 'the-three-percent-standard': 'The 3% Standard · Mike Rivera', 'long-sleeves': 'Long Sleeves · Mike Rivera'};
 let reading = false;
 function route(e){
   const old = location.hash.slice(1);
-  if (location.pathname === '/' && (old === 'articles' || ARTS.includes(old))){ history.replaceState(null, '', old === 'articles' ? '/articles' : '/articles/' + old); }   /* links shared before the move still work */
-  const p = location.pathname.replace(/\/+$/, ''), slug = p.startsWith('/articles/') ? p.slice(10) : '', art = ARTS.includes(slug), on = art || p === '/articles', h = location.hash.slice(1);
-  document.title = TITLES[art ? slug : on ? 'articles' : ''];
+  if (location.pathname === '/' && (old === 'articles' || old === 'ledger' || ARTS.includes(old))){ history.replaceState(null, '', ARTS.includes(old) ? '/articles/' + old : '/' + old); }   /* links shared before the move still work */
+  const p = location.pathname.replace(/\/+$/, ''), slug = p.startsWith('/articles/') ? p.slice(10) : '', art = ARTS.includes(slug), led = p === '/ledger', on = art || led || p === '/articles', h = location.hash.slice(1); if (!led) ledWatch(false);
+  document.title = TITLES[art ? slug : led ? 'ledger' : on ? 'articles' : ''];
   if (on){
     reading = true; root.classList.add('rd'); reader.hidden = false; $('main').hidden = true;
-    $('#rdIndex').hidden = art; ARTS.forEach(a => { $('#art-' + a).hidden = a !== slug; });
+    $('#rdIndex').hidden = art || led; ledEl.hidden = !led; reader.setAttribute('aria-label', led ? 'Build ledger' : 'Articles'); ARTS.forEach(a => { $('#art-' + a).hidden = a !== slug; });
     scrollTo({top: 0, behavior: 'instant'}); rdBar.style.transform = 'scaleX(0)';
-    const hd = (art ? $('#art-' + slug) : $('#rdIndex')).querySelector('h1'); if (hd && e) hd.focus({preventScroll: true});
-    document.querySelectorAll('.bar nav a, .mbar a').forEach(a => a.setAttribute('aria-current', String(a.pathname === '/articles')));
+    const hd = (art ? $('#art-' + slug) : led ? ledEl : $('#rdIndex')).querySelector('h1'); if (hd && e) hd.focus({preventScroll: true}); if (led) ledWatch(true);
+    document.querySelectorAll('.bar nav a, .mbar a').forEach(a => a.setAttribute('aria-current', String(a.pathname === (led ? '/ledger' : '/articles'))));
   } else {
     const was = reading;
     if (was){ reading = false; root.classList.remove('rd'); reader.hidden = true; $('main').hidden = false; dispatchEvent(new Event('resize')); needScene(); }
@@ -275,7 +319,7 @@ document.addEventListener('click', e => {
   const a = e.target.closest('a[href]');
   if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank' || a.origin !== location.origin || a.hasAttribute('data-src') || a.id === 'skip') return;
   const p = a.pathname.replace(/\/+$/, '');
-  if (p !== '' && p !== '/articles' && !(p.startsWith('/articles/') && ARTS.includes(p.slice(10)))) return;
+  if (p !== '' && p !== '/articles' && p !== '/ledger' && !(p.startsWith('/articles/') && ARTS.includes(p.slice(10)))) return;
   e.preventDefault();
   if (a.pathname + a.hash !== location.pathname + location.hash) history.pushState(null, '', a.pathname + a.hash);
   route('click');
@@ -442,7 +486,7 @@ const DEMOS = {
 
 initShow();
 
-/* ---------- 3D: Rivera Tower on the headland at El Morro, San Juan ---------- */
+/* ---------- 3D: The Rivera Nexus on the headland at El Morro, San Juan ---------- */
 function scene3d(){
 if (!window.THREE) { document.documentElement.classList.add('no-gl'); return; }
 let renderer;
@@ -533,10 +577,12 @@ const prFlag = canvasOf(300, 200, x => { for (let s = 0; s < 5; s++){ x.fillStyl
 const pole = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 5.4, 8), mats.mull); pole.position.set(W/2 - 1.2, 3.2, -D/2 + 1.2); roof.add(pole);
 const flagGeo = new THREE.PlaneGeometry(3.6, 2.4, 18, 8), flagBase = flagGeo.attributes.position.array.slice();
 const flag = new THREE.Mesh(flagGeo, new THREE.MeshStandardMaterial({map: texOf(prFlag), side: THREE.DoubleSide, roughness: .7})); flag.position.set(W/2 - 1.2 + 1.8, 4.6, -D/2 + 1.2); roof.add(flag);
-const logoImg = new Image(), signC = canvasOf(1024, 128, () => {}), signTex = texOf(signC);
-function drawSign(){ const x = signC.getContext('2d'); x.clearRect(0, 0, 1024, 128); x.font = '900 100px "Big Shoulders Display", "Arial Narrow", sans-serif'; x.textBaseline = 'middle'; x.fillStyle = '#eef3fa';
-  const has = logoImg.complete && logoImg.naturalWidth > 0, w = Math.min(x.measureText('RIVERA TOWER').width, 820), x0 = (1024 - w - (has ? 150 : 0))/2;
-  if (has) x.drawImage(logoImg, x0, 4, 137, 120); x.fillText('RIVERA TOWER', x0 + (has ? 150 : 0), 70, 820); signTex.needsUpdate = true; }
+const logoImg = new Image(), signC = canvasOf(2048, 256, () => {}), signTex = texOf(signC);
+function drawSign(){ const x = signC.getContext('2d'); const T = 'THE RIVERA NEXUS', F = px => '900 ' + px + 'px "Big Shoulders Display", "Arial Narrow", sans-serif', has = logoImg.complete && logoImg.naturalWidth > 0, lh = 200, lw = has ? 256 : 0, room = 2000 - lw;
+  x.clearRect(0, 0, 2048, 256); x.textBaseline = 'middle'; x.fillStyle = '#eef3fa'; x.font = F(200);
+  const px = Math.max(60, Math.min(200, Math.floor(200*room/x.measureText(T).width))); x.font = F(px);
+  const w = Math.min(x.measureText(T).width, room), x0 = (2048 - w - lw)/2;
+  if (has) x.drawImage(logoImg, x0, 128 - lh/2, lh*137/120, lh); x.fillText(T, x0 + lw, 134, room); signTex.needsUpdate = true; }
 logoImg.onload = drawSign; logoImg.src = LOGO; drawSign(); if (document.fonts) document.fonts.ready.then(drawSign);
 const sign = new THREE.Mesh(new THREE.PlaneGeometry(9.6, 1.2), new THREE.MeshBasicMaterial({map: signTex, transparent: true, toneMapped: false})); sign.position.set(-1.6, 1.75, D/2 + .02); roof.add(sign);
 { const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: new THREE.TextureLoader().load(KAS), toneMapped: false})); sp.scale.set(2.5, 1.62, 1); sp.position.set(5.6, 1.8, D/2 - .5); roof.add(sp); }
